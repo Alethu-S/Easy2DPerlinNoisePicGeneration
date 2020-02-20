@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import math
 import random
+
+
 class ValueNoise:
     def __init__(self, height, width, lattice, seed):
         self.height = height
@@ -61,6 +63,7 @@ class ValueNoise:
         cv2.imshow("value_noise_old_fade", value_noise_old_fade)
         cv2.imshow("value_noise_new_fade", value_noise_new_fade)
 
+
 class PerlinNoise:
     def __init__(self, height, width, lattice):
         self.height = height
@@ -93,7 +96,7 @@ class PerlinNoise:
                             49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
                             138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180]
         '''
-        for i in range(0,256):
+        for i in range(0, 256):
             self.premutation.append(i)
         random.seed(0)
         random.shuffle(self.premutation)
@@ -121,16 +124,17 @@ class PerlinNoise:
             return -y
         else:
             return 0
+
     def grad_old(self, has, x, y):
         h = has & 3
         if h == 0:
-            return x+y
+            return x + y
         elif h == 1:
-            return x-y
+            return x - y
         elif h == 2:
-            return -x+y
+            return -x + y
         elif h == 3:
-            return -x-y
+            return -x - y
         else:
             return 0
 
@@ -159,27 +163,35 @@ class PerlinNoise:
         y = self.lerp(v, x1, x2)
         return (y + 1) / 2
 
-    def octave_perlin(self,octaves,persistence):
-        pass
+    def octave_perlin_noise(self, x, y, octaves, persistence,smooth,dir):
+        total = 0.0
+        frequency = 4.0
+        amplitude = 128.0
+        maxValue = 0.0
+        for i in range(0, octaves):
+            total += self.perlin_noise(x * frequency, y * frequency,smooth,dir) * amplitude
+            maxValue += amplitude
+            amplitude *= persistence
+            frequency *= 2
+        return total / maxValue
 
-
-    def perlin_noise_main(self, smooth=0, dir = 0):
+    def perlin_noise_main(self, smooth=0, dir=0):
         dst = np.zeros((self.height, self.width), np.uint8)
         for i in range(0, self.height):
             for j in range(0, self.width):
                 x = i / lattice
                 y = j / lattice
-                dst[i, j] = 255 * self.perlin_noise(x, y, smooth, dir)
+                dst[i, j] = 255 * self.octave_perlin_noise(x, y, 6,0.5,smooth, dir)
         return dst
 
     def show_pic(self):
-        perlin_noise_old_fade = self.perlin_noise_main(1)
-        perlin_noise_old_dir = self.perlin_noise_main(0,1)
-        perlin_noise_old = self.perlin_noise_main(1,1)
+        # perlin_noise_old_fade = self.perlin_noise_main(1)
+        # perlin_noise_old_dir = self.perlin_noise_main(0, 1)
+        # perlin_noise_old = self.perlin_noise_main(1, 1)
         perlin_noise_new = self.perlin_noise_main()
-        cv2.imshow("perlin_noise_old_fade", perlin_noise_old_fade)
-        cv2.imshow("perlin_noise_old_dir", perlin_noise_old_dir)
-        cv2.imshow("perlin_noise_old", perlin_noise_old)
+        # cv2.imshow("perlin_noise_old_fade", perlin_noise_old_fade)
+        # cv2.imshow("perlin_noise_old_dir", perlin_noise_old_dir)
+        # cv2.imshow("perlin_noise_old", perlin_noise_old)
         cv2.imshow("perlin_noise_new", perlin_noise_new)
 
 
@@ -190,11 +202,11 @@ lattice = 600
 vn = ValueNoise(dstHeight, dstWidth, lattice, 0)
 # vn.show_pic()
 
-pn = PerlinNoise(dstHeight, dstWidth, lattice)
-pn.show_pic()
-cv2.waitKey(0)
-# for lattice in range(40,100):
-#     pn  = PerlinNoise(256,256,lattice)
-#     pn.show_pic()
-#     print("lattice:",lattice)
-#     cv2.waitKey(600)
+# pn = PerlinNoise(dstHeight, dstWidth, lattice)
+# pn.show_pic()
+# cv2.waitKey(0)
+for lattice in range(40,100):
+    pn  = PerlinNoise(256,256,lattice)
+    pn.show_pic()
+    print("lattice:",lattice)
+    cv2.waitKey(600)
