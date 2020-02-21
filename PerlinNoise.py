@@ -126,17 +126,24 @@ class PerlinNoise:
             return 0
 
     def grad_old(self, has, x, y):
-        h = has & 3
+        h = has & 7
         if h == 0:
-            return x + y
+            return x
         elif h == 1:
-            return x - y
+            return -x
         elif h == 2:
-            return -x + y
+            return y
         elif h == 3:
+            return -y
+        elif h == 4:
+            return x + y
+        elif h == 5:
+            return x - y
+        elif h == 6:
+            return -x + y
+        elif h == 7:
             return -x - y
-        else:
-            return 0
+        return 0
 
     def perlin_noise(self, x, y, smooth, dir):
         X = math.floor(x) & 255
@@ -198,15 +205,15 @@ class PerlinNoise:
 # All_Used
 dstWidth = 600
 dstHeight = 600
-lattice = 600
+lattice = 300
 vn = ValueNoise(dstHeight, dstWidth, lattice, 0)
 # vn.show_pic()
 
-# pn = PerlinNoise(dstHeight, dstWidth, lattice)
-# pn.show_pic()
-# cv2.waitKey(0)
-for lattice in range(40,100):
-    pn  = PerlinNoise(256,256,lattice)
-    pn.show_pic()
-    print("lattice:",lattice)
-    cv2.waitKey(600)
+pn = PerlinNoise(dstHeight, dstWidth, lattice)
+pn.show_pic()
+cv2.waitKey(0)
+# for lattice in range(40,100):
+#     pn  = PerlinNoise(256,256,lattice)
+#     pn.show_pic()
+#     print("lattice:",lattice)
+#     cv2.waitKey(600)
